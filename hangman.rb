@@ -1,5 +1,15 @@
 # frozen_string_literal: true
 
+class String
+
+  def indexes sub_string,start=0
+    index = self[start..-1].index(sub_string)
+    return [] unless index
+    [index+start] + indexes(sub_string,index+start+1)
+  end
+
+end
+
 class Game
   attr_reader :words, :secret, :guesses, :over
 
@@ -19,11 +29,12 @@ class Game
     @letter = gets.chomp
   end
 
-  # def mark
-  #   if @secret.include?(@letter)
-  #     @board.gsub()
-  #   end
-  # end
+  def mark
+    if @secret.include?(@letter)
+      i = @secret.index(@letter)
+      # @secret.
+    end
+  end
 
 end
 
