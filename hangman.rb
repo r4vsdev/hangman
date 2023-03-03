@@ -11,13 +11,13 @@ class Game
   end
 
   def display
-    p @board = @secret.split('').join(' ').gsub(/[a-z]/, '_')
+    puts @board = @secret.split('').join(' ').gsub(/[a-z]/, '_')
   end
 
-  # def player_move
-  #   puts 'Choose a letter: '
-  #   @letter = gets.chomp
-  # end
+  def player_move
+    puts 'Choose a letter: '
+    @letter = gets.chomp
+  end
 
   # def mark
   #   if @secret.include?(@letter)
@@ -33,6 +33,6 @@ puts 'The game has started. Try to guess the secret word.'
 unless game.over
   puts "You have #{game.guesses} guesses left"
   game.display
-  # game.player_move
+  game.player_move
   # game.mark
 end
