@@ -12,24 +12,23 @@ end
 # p 'einstein'.indexes('in') #=> [1, 6]
 
 class Game
-  attr_reader :words, :secret, :tries, :over, :guess, :correct_tries, :wrong_tries
+  attr_reader :words, :secret, :tries, :over, :guess, :correct, :wrong
 
   def initialize
     # @words = File.readlines('r.txt')
     @secret = 'articla' # words.map(&:chomp).filter { |word| word.size.between?(5, 12) }.sample
     @tries = 8
     @over = false
-    @correct_tries = []
-    @wrong_tries = []
+    @correct = []
+    @wrong = []
   end
 
-  def display(char = @guess)
-    if @guess.nil?
-      puts @secret.split('').join(' ').gsub(/[a-z]/, '_')
+  def display(tries_arr = @guess)
+    board = secret.gsub(/[a-z]/, '_')
+    if tries_arr.nil?
+      p board
     else
-      puts @secret.split('').join(' ').gsub(/[a-z]/) { |letter|
-        letter == char || letter == ' ' ? char : '_'
-      }
+      puts secret.gsub(/[a-z]/) { |letter| tries_arr.include?(letter) ? letter : '_' }
     end
   end
 
@@ -40,22 +39,22 @@ class Game
 
   def mark
     if @secret.include?(@guess)
-      @correct_tries << @guess
-      display(@guess)
+      @correct << @guess
+      display(@correct)
     else
       @tries -= 1
-      @wrong_tries << @guess
+      @wrong << @guess
     end
   end
 end
 
 game = Game.new
 puts 'The game has started. Try to guess the secret word.', ''
+game.display
 
 until game.over
   puts "#{game.tries} guesses left"
-  game.display(game.guess)
   game.player_move
   game.mark
-  print "Correct = #{game.correct_tries} ", "Wrong = #{game.wrong_tries} "
+  print "Correct = #{game.correct} ", "Wrong = #{game.wrong} "
 end
