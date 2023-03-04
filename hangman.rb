@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class String
-  def indexes sub_string, start = 0
-    index = self[start..-1].index(sub_string)
+  def indexes(sub_string, start = 0)
+    index = self[start..].index(sub_string)
     return [] unless index
 
     [index + start] + indexes(sub_string, index + start + 1)
@@ -21,12 +21,6 @@ class Game
     @over = false
   end
 
-  # def display
-  #   puts @secret.split('').join(' ').gsub(/[a-z]/, '_')
-  # end
-
-  # printe a palavra com _ exceto as letras certas
-  #
   def display(char = '')
     if char == ''
       puts @secret.split('').join(' ').gsub(/[a-z]/, '_')
@@ -43,9 +37,11 @@ class Game
   end
 
   def mark
-    if @secret.include?(@guess)
-      display(@guess)
-    end
+    @tries -= 1
+    return unless @secret.include?(@guess)
+
+    @tries += 1
+    display(@guess)
   end
 end
 
