@@ -55,6 +55,10 @@ class Game
       puts ' ', ' ', 'Game Over', ' '
       @over = true
     end
+    if secret.split('').uniq.sort == correct.sort
+      puts ' ', ' ', 'You Won!', ' '
+      @over = true
+    end
   end
 end
 
