@@ -26,7 +26,7 @@ class Game
   def display(tries_arr = @guess)
     board = secret.gsub(/[a-z]/, '_')
     if tries_arr.nil?
-      p board
+      puts board
     else
       puts secret.gsub(/[a-z]/) { |letter| tries_arr.include?(letter) ? letter : '_' }
     end
@@ -40,10 +40,20 @@ class Game
   def mark
     if @secret.include?(@guess)
       @correct << @guess
+      @correct.uniq!
       display(@correct)
     else
       @tries -= 1
       @wrong << @guess
+      @wrong.uniq!
+      display(@correct)
+    end
+  end
+
+  def over?
+    if tries == 0
+      puts ' ', ' ', 'Game Over', ' '
+      @over = true
     end
   end
 end
@@ -57,4 +67,5 @@ until game.over
   game.player_move
   game.mark
   print "Correct = #{game.correct} ", "Wrong = #{game.wrong} "
+  game.over?
 end
