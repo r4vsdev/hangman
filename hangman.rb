@@ -26,9 +26,9 @@ class Game
   def display(tries_arr = @guess)
     board = secret.gsub(/[a-z]/, '_')
     if tries_arr.nil?
-      puts board
+      puts board.split('').join(' ')
     else
-      puts secret.gsub(/[a-z]/) { |letter| tries_arr.include?(letter) ? letter : '_' }
+      puts secret.gsub(/[a-z]/) { |letter| tries_arr.include?(letter) ? letter : '_' }.split('').join(' ')
     end
   end
 
