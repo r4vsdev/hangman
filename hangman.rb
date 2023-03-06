@@ -3,7 +3,6 @@
 require 'yaml'
 
 class Game
-  # attr_reader :secret, :tries, :over, :correct, :wrong
   attr_accessor :secret, :tries, :over, :correct, :wrong
 
   @@words = File.readlines('r.txt')
@@ -35,6 +34,8 @@ class Game
   end
 
   def mark
+    return puts 'Try not to repeat letters' if @correct.include?(@guess) || @wrong.include?(@guess)
+
     if @secret.include?(@guess)
       @correct << @guess
       @correct.uniq!
@@ -58,17 +59,17 @@ class Game
   end
 
   def serialize
-    YAML.dump ({
-      :secret => @secret,
-      :tries => tries,
-      :over => over,
-      :correct => @correct,
-      :wrong => @wrong
-    })
+    YAML.dump({
+                secret: @secret,
+                tries: tries,
+                over: over,
+                correct: @correct,
+                wrong: @wrong
+              })
   end
 
   def deserialize(yaml_string)
-    data = YAML.load yaml_string
+    data = YAML.safe_load yaml_string
     @secret = data[:secret]
     @tries = data[:tries]
     @over = data[:over]
@@ -85,17 +86,19 @@ until game.over
   puts ' ', ' ', 'Press Enter to continue playing, 1 to load a file, 2 to save the game'
   action = gets
   puts "#{game.tries} guesses left"
-  if action == "\n"
+  case action
+  when "\n"
     game.display(game.correct)
+    print "Correct = #{game.correct} ", "Wrong = #{game.wrong} "
     game.player_move
     game.mark
     print "Correct = #{game.correct} ", "Wrong = #{game.wrong} "
     game.over?
-  elsif action == "1\n"
+  when "1\n"
     puts 'Loading data...'
     save = File.open('hangman_save', 'r')
-    data = game.deserialize(save)
-  elsif action == "2\n"
+    game.deserialize(save)
+  when "2\n"
     puts 'Serializing data...'
     yaml = game.serialize
     File.open('hangman_save', 'w') { |save_file| save_file.puts yaml }
