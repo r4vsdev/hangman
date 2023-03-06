@@ -1,22 +1,11 @@
 # frozen_string_literal: true
 
-class String
-  def indexes(sub_string, start = 0)
-    index = self[start..].index(sub_string)
-    return [] unless index
-
-    [index + start] + indexes(sub_string, index + start + 1)
-  end
-end
-
-# p 'einstein'.indexes('in') #=> [1, 6]
-
 class Game
-  attr_reader :words, :secret, :tries, :over, :guess, :correct, :wrong
+  attr_reader :secret, :tries, :over, :correct, :wrong
 
   def initialize
-    # @words = File.readlines('r.txt')
-    @secret = 'articla' # words.map(&:chomp).filter { |word| word.size.between?(5, 12) }.sample
+    @words = File.readlines('r.txt')
+    @secret = @words.map(&:chomp).filter { |word| word.size.between?(5, 12) }.sample
     @tries = 8
     @over = false
     @correct = []
@@ -33,32 +22,47 @@ class Game
   end
 
   def player_move
-    print 'Choose a letter: '
-    @guess = gets.chomp.downcase
+    if action == 1
+      print 'Choose a letter: '
+      @guess = gets.chomp.downcase
+      return unless @guess.size > 1
+
+      puts 'Erroneous input! Try again...'
+      player_move
+    elsif action == 2
+
+    end
   end
 
   def mark
     if @secret.include?(@guess)
       @correct << @guess
       @correct.uniq!
-      display(@correct)
     else
       @tries -= 1
       @wrong << @guess
       @wrong.uniq!
-      display(@correct)
     end
+    display(@correct)
   end
 
   def over?
-    if tries == 0
-      puts ' ', ' ', 'Game Over', ' '
+    if tries.zero?
+      puts ' ', ' ', "Game Over. The word was #{secret} =(", ' '
       @over = true
     end
-    if secret.split('').uniq.sort == correct.sort
-      puts ' ', ' ', 'You Won!', ' '
-      @over = true
-    end
+    return unless secret.split('').uniq.sort == correct.sort
+
+    puts ' ', ' ', 'You Won!', ' '
+    @over = true
+  end
+
+  def serialize
+    YAML::dump(self)
+  end
+
+  def deserialize(yaml_string)
+    YAML::load(yaml_string)
   end
 end
 
@@ -68,6 +72,9 @@ game.display
 
 until game.over
   puts "#{game.tries} guesses left"
+  puts 'Press 1 to continue playing, or 2 to save the game' # Add topic number 5
+  action = gets.chomp
+  
   game.player_move
   game.mark
   print "Correct = #{game.correct} ", "Wrong = #{game.wrong} "
