@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
+require 'yaml'
+
 class Game
-  attr_reader :secret, :tries, :over, :correct, :wrong
+  # attr_reader :secret, :tries, :over, :correct, :wrong
+  attr_accessor :secret, :tries, :over, :correct, :wrong
+
+  @@words = File.readlines('r.txt')
 
   def initialize
-    @words = File.readlines('r.txt')
-    @secret = @words.map(&:chomp).filter { |word| word.size.between?(5, 12) }.sample
+    @secret = @@words.map(&:chomp).filter { |word| word.size.between?(5, 12) }.sample
     @tries = 8
     @over = false
     @correct = []
@@ -22,16 +26,12 @@ class Game
   end
 
   def player_move
-    if action == 1
-      print 'Choose a letter: '
-      @guess = gets.chomp.downcase
-      return unless @guess.size > 1
+    print 'Choose a letter: '
+    @guess = gets.chomp.downcase
+    return unless @guess.size > 1
 
-      puts 'Erroneous input! Try again...'
-      player_move
-    elsif action == 2
-
-    end
+    puts 'Erroneous input! Try again...'
+    player_move
   end
 
   def mark
@@ -58,11 +58,22 @@ class Game
   end
 
   def serialize
-    YAML::dump(self)
+    YAML.dump ({
+      :secret => @secret,
+      :tries => tries,
+      :over => over,
+      :correct => @correct,
+      :wrong => @wrong
+    })
   end
 
   def deserialize(yaml_string)
-    YAML::load(yaml_string)
+    data = YAML.load yaml_string
+    @secret = data[:secret]
+    @tries = data[:tries]
+    @over = data[:over]
+    @correct = data[:correct]
+    @wrong = data[:wrong]
   end
 end
 
@@ -71,12 +82,23 @@ puts 'The game has started. Try to guess the secret word.', ''
 game.display
 
 until game.over
+  puts ' ', ' ', 'Press Enter to continue playing, 1 to load a file, 2 to save the game'
+  action = gets
   puts "#{game.tries} guesses left"
-  puts 'Press 1 to continue playing, or 2 to save the game' # Add topic number 5
-  action = gets.chomp
-  
-  game.player_move
-  game.mark
-  print "Correct = #{game.correct} ", "Wrong = #{game.wrong} "
-  game.over?
+  if action == "\n"
+    game.display(game.correct)
+    game.player_move
+    game.mark
+    print "Correct = #{game.correct} ", "Wrong = #{game.wrong} "
+    game.over?
+  elsif action == "1\n"
+    puts 'Loading data...'
+    save = File.open('hangman_save', 'r')
+    data = game.deserialize(save)
+  elsif action == "2\n"
+    puts 'Serializing data...'
+    yaml = game.serialize
+    File.open('hangman_save', 'w') { |save_file| save_file.puts yaml }
+  end
+
 end

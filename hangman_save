@@ -1,0 +1,13 @@
+---
+:secret: weapons
+:tries: 4
+:over: false
+:correct:
+- a
+- e
+- o
+:wrong:
+- r
+- i
+- u
+- d
